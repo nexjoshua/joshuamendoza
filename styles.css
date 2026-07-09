@@ -819,3 +819,54 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
 .legal-section{padding-bottom:2rem;border-bottom:1px solid var(--panel-border)}
 .legal-section:last-child{border-bottom:none;padding-bottom:0}
 .legal-meta{color:var(--muted-2);font-size:.85rem}
+/* ============ MOBILE FIXES ============ */
+
+/* 1) Proof cards: only $6.32 shows because JS pins the other two
+   off-screen with data-x transforms. Turn it into a swipeable
+   row so all three cards are reachable within the pinned section. */
+@media (max-width:900px){
+  .proof-cards{
+    flex-direction:row;
+    justify-content:flex-start;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    width:100%;
+    height:auto;
+    padding:0 12vw;
+    gap:1rem;
+  }
+  .proof-cards::-webkit-scrollbar{display:none}
+  .review-card{
+    position:relative !important;
+    transform:none !important;
+    top:auto !important;
+    left:auto !important;
+    flex:0 0 78%;
+    scroll-snap-align:center;
+  }
+}
+
+/* 2) Word-cloud (skills 3D scene) overflows the screen and reads
+   as a "whirlwind." Scale the whole thing down and clip overflow
+   so it stays small and centered. */
+@media (max-width:640px){
+  .skills-3d-scene{
+    height:300px;
+    overflow:hidden;
+    perspective:800px;
+  }
+  .skills-3d-tilt{
+    transform:scale(.5);
+    transform-origin:center center;
+  }
+}
+
+/* 3) Glowing/blue bar behind the logo on scroll — the ambient
+   home-gradient / proof glow is bleeding through the translucent
+   nav on mobile. Give the nav a solid-ish backing so it blocks it. */
+@media (max-width:1023px){
+  .topnav{
+    background:rgba(10,10,11,.7);
+  }
+}

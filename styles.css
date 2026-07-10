@@ -104,7 +104,7 @@ body.is-loading .glass-cursor{display:none}
 
 .backdrop-blur-layer{position:fixed;inset:0;z-index:-40;height:100vh;width:100vw;backdrop-filter:blur(70px)}
 .layout-gradient{
-  position:fixed;top:0;left:0;z-index:-50;height:85vh;width:100%;
+  position:fixed;top:0;left:0;z-index:-50;height:100vh;width:100%;
   background:linear-gradient(to bottom right,var(--accent),#0d0d0e);
   opacity:.35;
 }
@@ -315,7 +315,7 @@ main{width:100%;padding:0 20px}
 }
 
 .hero{position:relative;isolation:isolate;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2rem;padding-top:8rem;margin-bottom:-2px}
-.home-gradient{position:fixed;top:0;left:0;z-index:-50;height:95vh;width:100%;background:linear-gradient(to top left,var(--accent),#0d0d0e);opacity:0;pointer-events:none}
+.home-gradient{position:fixed;top:0;left:0;z-index:-50;height:100vh;width:100%;background:linear-gradient(to top left,var(--accent),#0d0d0e);opacity:0;pointer-events:none}
 .hero-content{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:1.75rem;max-width:900px}
 .hero-namecard{
   position:absolute; inset:0; z-index:11;
@@ -830,11 +830,16 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
     justify-content:flex-start;
     overflow-x:auto;
     scroll-snap-type:x mandatory;
+    scroll-snap-stop:always;
     -webkit-overflow-scrolling:touch;
     width:100%;
     height:auto;
-    padding:0 12vw;
+    padding:0 9vw;
     gap:1rem;
+    /* fade the edges so a partially-visible next card reads as "swipe for
+       more" on purpose, instead of looking like it's cut off/broken */
+    -webkit-mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+    mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent);
   }
   .proof-cards::-webkit-scrollbar{display:none}
   .review-card{
@@ -842,8 +847,22 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
     transform:none !important;
     top:auto !important;
     left:auto !important;
-    flex:0 0 78%;
+    flex:0 0 82%;
     scroll-snap-align:center;
+  }
+}
+
+/* Small idle drift for the X logo behind "Real Results" — the desktop
+   version rotates it as you scroll through the pinned section, but that
+   pin is intentionally skipped on mobile, so this keeps some motion
+   instead of the logo just sitting static. */
+@keyframes logoIdleDrift{
+  0%,100%{ transform: rotate(-13deg) scale(.95); }
+  50%{ transform: rotate(13deg) scale(1.05); }
+}
+@media (max-width:900px){
+  .proof-logo-bg img{
+    animation: logoIdleDrift 7s ease-in-out infinite;
   }
 }
 
@@ -892,5 +911,5 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
    plus a little breathing room under the stat numbers. */
 @media (max-width:900px){
   .backdrop-blur-layer{ backdrop-filter: blur(30px); }
-  .stats-strip{ margin-top: 2rem; }
+  .stats-strip{ margin-top: 3.5rem; }
 }

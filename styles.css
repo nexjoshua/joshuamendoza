@@ -870,3 +870,27 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
     background:rgba(10,10,11,.7);
   }
 }
+
+/* 4) Real Results section shouldn't stay scroll-pinned on mobile — the
+   pinned scrub animation depends on viewport-height math that mobile
+   browsers change mid-scroll as the address bar hides/shows, which is
+   why only the middle card ever fully appeared, and why its glow could
+   bleed up into the stats section above as the pin released oddly.
+   script.js now skips the pin entirely under 901px; this just removes
+   the tall spacer + sticky positioning so the section lays out normally. */
+@media (max-width:900px){
+  .proof{min-height:auto}
+  .proof-pin{
+    position:relative;
+    height:auto;
+    padding:4.5rem 0 3rem;
+  }
+}
+
+/* 5) Cheaper blur on the fixed backdrop layer (heavy 70px blur on a
+   fixed layer is a common source of scroll banding on mobile GPUs)
+   plus a little breathing room under the stat numbers. */
+@media (max-width:900px){
+  .backdrop-blur-layer{ backdrop-filter: blur(30px); }
+  .stats-strip{ margin-top: 2rem; }
+}

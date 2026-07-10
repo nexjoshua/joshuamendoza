@@ -742,54 +742,31 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
     overflow:visible;
     padding:4.5rem 0 3rem;
   }
+  /* All three cards fit on screen at once — no horizontal swipe needed */
   .proof-cards{
-    flex-direction:row;
-    justify-content:flex-start;
-    overflow-x:auto;
-    scroll-behavior:smooth;
-    scroll-snap-type:x mandatory;
-    scroll-snap-stop:always;
-    -webkit-overflow-scrolling:touch;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
     width:100%;
     height:auto;
-    padding:0 5vw;
-    gap:0;
+    gap:.6rem;
+    padding:0 4vw;
   }
-  .proof-cards::-webkit-scrollbar{display:none}
   .review-card{
     position:relative !important;
     transform:none !important;
     top:auto !important;
     left:auto !important;
-    /* exactly one card per screen — no ambiguous partial peek */
-    flex:0 0 90%;
-    width:90%;
-    margin-right:2.5vw;
-    scroll-snap-align:center;
-    transition:opacity .35s var(--ease), transform .35s var(--ease);
+    width:auto;
+    padding:1rem .5rem;
+    gap:.5rem;
   }
-  .review-card:last-child{margin-right:0}
+  .review-value{ font-size:clamp(1.05rem, 5vw, 1.6rem); }
+  .review-author strong{ font-size:.68rem; line-height:1.25; }
+  .review-author small{ font-size:.58rem; line-height:1.3; }
 }
 
-/* Dot indicators make it unmistakable that there are 3 cards to swipe
-   through — the plain peek-of-the-next-card approach wasn't reliably
-   communicating that, and could leave the last card easy to miss. */
+/* Dots aren't needed anymore now that all three cards are visible together */
 .proof-dots{display:none}
-@media (max-width:900px){
-  .proof-dots{
-    display:flex;justify-content:center;align-items:center;gap:.5rem;
-    margin-top:.5rem;
-  }
-  .proof-dot{
-    width:7px;height:7px;border-radius:50%;
-    background:rgba(255,255,255,.25);
-    transition:background-color .3s var(--ease), transform .3s var(--ease);
-  }
-  .proof-dot.is-active{
-    background:var(--accent-bright);
-    transform:scale(1.35);
-  }
-}
 
 /* Small idle drift for the X logo behind "Real Results" — the desktop
    version rotates it as you scroll through the pinned section, but that

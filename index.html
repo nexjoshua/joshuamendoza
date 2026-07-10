@@ -745,17 +745,14 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
     flex-direction:row;
     justify-content:flex-start;
     overflow-x:auto;
+    scroll-behavior:smooth;
     scroll-snap-type:x mandatory;
     scroll-snap-stop:always;
     -webkit-overflow-scrolling:touch;
     width:100%;
     height:auto;
-    padding:0 9vw;
-    gap:1rem;
-    /* fade the edges so a partially-visible next card reads as "swipe for
-       more" on purpose, instead of looking like it's cut off/broken */
-    -webkit-mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-    mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+    padding:0 5vw;
+    gap:0;
   }
   .proof-cards::-webkit-scrollbar{display:none}
   .review-card{
@@ -763,9 +760,14 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
     transform:none !important;
     top:auto !important;
     left:auto !important;
-    flex:0 0 82%;
+    flex:0 0 90%;
+    width:90%;
+    margin-right:2.5vw;
     scroll-snap-align:center;
+    /* a real transition as each card settles into view, not just a hard jump */
+    transition:opacity .35s var(--ease), transform .35s var(--ease);
   }
+  .review-card:last-child{margin-right:0}
 }
 
 /* Small idle drift for the X logo behind "Real Results" — the desktop
@@ -813,7 +815,8 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
    was the ambient proof-section glow bleeding through as its pin
    released oddly on mobile). Lighter blur + the pin fix above resolve it. */
 @media (max-width:900px){
-  .backdrop-blur-layer{ backdrop-filter: blur(30px); }
+  .backdrop-blur-layer{ display:none; }
+  .layout-gradient{ display:none; }
 }
 
 /* 5) Clear breathing room above the stat cards so nothing sits flush

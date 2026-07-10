@@ -725,6 +725,82 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
 @media (prefers-reduced-motion: reduce){
   *{transition-duration:0.01ms !important; animation-duration:0.01ms !important}
 }
+
+/* ============ MOBILE FIXES ============ */
+
+/* 1) Proof cards: instead of relying on a scroll-pinned animation whose
+   timing depends on viewport height (which mobile browsers change
+   mid-scroll as the address bar hides/shows — the reason only the
+   middle "$6.32" card ever reliably appeared), the cards are laid out
+   as a simple swipeable row. script.js also skips the pin/scrub entirely
+   below 901px so all three are visible and reachable by swipe. */
+@media (max-width:900px){
+  .proof{min-height:auto}
+  .proof-pin{
+    position:relative;
+    height:auto;
+    padding:4.5rem 0 3rem;
+  }
+  .proof-cards{
+    flex-direction:row;
+    justify-content:flex-start;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    width:100%;
+    height:auto;
+    padding:0 12vw;
+    gap:1rem;
+  }
+  .proof-cards::-webkit-scrollbar{display:none}
+  .review-card{
+    position:relative !important;
+    transform:none !important;
+    top:auto !important;
+    left:auto !important;
+    flex:0 0 78%;
+    scroll-snap-align:center;
+  }
+}
+
+/* 2) Word-cloud (skills 3D scene) overflows the screen and reads
+   as a "whirlwind." Scale the whole thing down and clip overflow
+   so it stays small and centered. */
+@media (max-width:640px){
+  .skills-3d-scene{
+    height:300px;
+    overflow:hidden;
+    perspective:800px;
+  }
+  .skills-3d-tilt{
+    transform:scale(.5);
+    transform-origin:center center;
+  }
+}
+
+/* 3) Glowing/blue bar behind the logo on scroll — the ambient
+   home-gradient / proof glow is bleeding through the translucent
+   nav on mobile. Give the nav a solid-ish backing so it blocks it. */
+@media (max-width:1023px){
+  .topnav{
+    background:rgba(10,10,11,.7);
+  }
+}
+
+/* 4) Cheaper blur on the fixed backdrop layer — the heavy 70px blur
+   on a position:fixed layer is a common source of scroll banding /
+   "flashing" artifacts on mobile GPUs (this is also what was showing
+   up as a stray blue band across the top of the stat cards, since it
+   was the ambient proof-section glow bleeding through as its pin
+   released oddly on mobile). Lighter blur + the pin fix above resolve it. */
+@media (max-width:900px){
+  .backdrop-blur-layer{ backdrop-filter: blur(30px); }
+}
+
+/* 5) A little breathing room under the stat numbers */
+@media (max-width:900px){
+  .stats-strip{ margin-top: 2rem; }
+}
 </style>
 <body>
 <div id="preloader">

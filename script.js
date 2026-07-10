@@ -98,10 +98,19 @@ document.querySelectorAll('[data-cursor="expand"]').forEach((el) => {
 const HERO_END = '+=160%'; // extra scroll distance the hero stays pinned for
 
 if (document.querySelector('.hero')) {
-  gsap.to('.home-gradient', {
-    opacity: 1,
-    scrollTrigger: { trigger: '.hero', start: 'top top', end: HERO_END, scrub: true },
+  // The scroll-tied tint layer is desktop-only — on mobile it was tied to a
+  // very long scrub range (hero pin + 160%) and, combined with the fixed
+  // full-viewport blur layer, produced a stray blue band as it composited
+  // mid-scroll. Mobile just keeps it off (see CSS: .layout-gradient /
+  // .backdrop-blur-layer are disabled under 900px too).
+  const heroGradientMM = gsap.matchMedia();
+  heroGradientMM.add('(min-width: 901px)', () => {
+    gsap.to('.home-gradient', {
+      opacity: 1,
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: HERO_END, scrub: true },
+    });
   });
+
   gsap.to('#scrollHint', {
     opacity: 0,
     scrollTrigger: { trigger: '.hero', start: 'top top', end: '15% top', scrub: true },

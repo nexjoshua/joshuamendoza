@@ -273,8 +273,8 @@ proofMM.add('(max-width: 900px)', () => {
   // No pin, no scroll-hijack — the pinned scrub animation depended on a
   // stable 100vh, which mobile browsers change mid-scroll as the address
   // bar hides/shows, so only the middle card ever reliably finished
-  // fading in. Here all three cards are simply visible and swipeable,
-  // with a light fade-in like the rest of the page.
+  // fading in. Here all three cards sit in a compact 3-up grid so they're
+  // all visible together, with a light fade-in like the rest of the page.
   gsap.set('.review-card', { clearProps: 'transform,opacity,xPercent,yPercent,x,y,rotate' });
   gsap.set('.review-card', { opacity: 1 });
 
@@ -287,43 +287,6 @@ proofMM.add('(max-width: 900px)', () => {
     scrollTrigger: { trigger: '.proof-cards', start: 'top 90%' },
   });
 });
-
-/* ================= "Real Results" dot indicators (mobile carousel) =================
-   Makes it unmistakable that there are 3 cards to swipe through, and which
-   one is currently centered — a plain edge-peek wasn't reliably getting
-   that across, and the last card was easy to miss entirely. */
-(function initProofDots() {
-  const track = document.getElementById('proofCards');
-  const dotsWrap = document.getElementById('proofDots');
-  if (!track || !dotsWrap) return;
-  const cards = Array.from(track.querySelectorAll('.review-card'));
-  const dots = Array.from(dotsWrap.querySelectorAll('.proof-dot'));
-  if (!cards.length || !dots.length) return;
-
-  let ticking = false;
-  function updateActiveDot() {
-    ticking = false;
-    const trackRect = track.getBoundingClientRect();
-    const viewCenter = trackRect.left + trackRect.width / 2;
-    let closestIndex = 0;
-    let closestDist = Infinity;
-    cards.forEach((card, i) => {
-      const r = card.getBoundingClientRect();
-      const cardCenter = r.left + r.width / 2;
-      const dist = Math.abs(cardCenter - viewCenter);
-      if (dist < closestDist) { closestDist = dist; closestIndex = i; }
-    });
-    dots.forEach((d, i) => d.classList.toggle('is-active', i === closestIndex));
-  }
-
-  track.addEventListener('scroll', () => {
-    if (!ticking) { ticking = true; requestAnimationFrame(updateActiveDot); }
-  }, { passive: true });
-
-  window.addEventListener('resize', updateActiveDot);
-  window.addEventListener('load', updateActiveDot);
-  updateActiveDot();
-})();
 
 /* ================= generic scroll reveals ================= */
 gsap.utils.toArray(

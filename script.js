@@ -1,5 +1,11 @@
 gsap.registerPlugin(ScrollTrigger);
 
+// iOS/Android address bars resizing mid-scroll used to fire a "resize"
+// event that made ScrollTrigger recalculate every pinned section on the
+// spot — that's what was causing the hero to jump/shake as you scrolled.
+// This tells ScrollTrigger to ignore those height-only "resizes".
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 /* ================= preloader ================= */
 (function initPreloader() {
   const pre = document.getElementById('preloader');
@@ -57,6 +63,8 @@ const lenis = new Lenis({
   duration: 0.5,
   easing: (t) => 1 - Math.pow(1 - t, 3),
   smoothWheel: true,
+  syncTouch: true,       // keeps pinned sections from jittering under touch scroll
+  syncTouchLerp: 0.075,
 });
 lenis.on('scroll', ScrollTrigger.update);
 gsap.ticker.add((time) => lenis.raf(time * 1000));
@@ -154,7 +162,18 @@ if (heroCanvas) {
     frames[i] = img;
   }
 
-  window.addEventListener('resize', () => { resizeCanvas(); ScrollTrigger.refresh(); });
+  // Only force a full ScrollTrigger refresh on real width changes
+  // (actual resize/orientation change) — not on mobile address-bar
+  // show/hide, which also fires "resize" but only changes height and
+  // was causing the pinned hero to jump mid-scroll.
+  let heroLastWidth = window.innerWidth;
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    if (window.innerWidth !== heroLastWidth) {
+      heroLastWidth = window.innerWidth;
+      ScrollTrigger.refresh();
+    }
+  });
   resizeCanvas();
 
   const heroContentEl = document.getElementById('heroContent');
@@ -202,37 +221,63 @@ if (heroCanvas) {
     },
   });
 }
-if (document.getElementById('proofLogoBg')) {
-  gsap.fromTo('#proofLogoBg img',
-    { rotate: -18, scale: .92 },
-    { rotate: 18, scale: 1.08, ease: 'none',
-      scrollTrigger: { trigger: '#proof', start: 'top top', end: '+=150%', scrub: 0.6 } }
-  );
-}
 
-/* ================= pinned reveal (home: "results speak") ================= */
-if (document.getElementById('proofPin')) {
-  const proofTl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '#proof', start: 'top top', end: '+=150%', scrub: 0.6, pin: '#proofPin',
-    },
+/* ================= "Real Results" — desktop gets the pinned scrub
+   animation, mobile gets a plain swipeable reveal ================= */
+const proofMM = gsap.matchMedia();
+
+proofMM.add('(min-width: 901px)', () => {
+  if (document.getElementById('proofLogoBg')) {
+    gsap.fromTo('#proofLogoBg img',
+      { rotate: -18, scale: .92 },
+      { rotate: 18, scale: 1.08, ease: 'none',
+        scrollTrigger: { trigger: '#proof', start: 'top top', end: '+=150%', scrub: 0.6 } }
+    );
+  }
+
+  if (document.getElementById('proofPin')) {
+    const proofTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#proof', start: 'top top', end: '+=150%', scrub: 0.6,
+        pin: '#proofPin', pinType: 'transform',
+      },
+    });
+    document.querySelectorAll('.review-card').forEach((card) => {
+      const x = parseFloat(card.dataset.x || 0);
+      const r = parseFloat(card.dataset.r || 0);
+      gsap.set(card, { xPercent: -50, yPercent: -50, x, y: 90, rotate: r, opacity: 0 });
+    });
+    proofTl
+      .from('.proof-heading', { opacity: 0, scale: 0.4, duration: 0.4 })
+      .to('.proof-heading', { opacity: 1, scale: 1, duration: 0.001 }, 0)
+      .to('.proof-heading', { opacity: 0, y: -40, duration: 0.3 }, 0.35)
+      .to('.review-card', {
+        opacity: 1, y: 0,
+        x: (i, el) => parseFloat(el.dataset.x || 0),
+        rotate: (i, el) => parseFloat(el.dataset.r || 0),
+        stagger: 0.15, duration: 0.6, ease: 'power2.out',
+      }, 0.3);
+  }
+});
+
+proofMM.add('(max-width: 900px)', () => {
+  // No pin, no scroll-hijack — the pinned scrub animation depended on a
+  // stable 100vh, which mobile browsers change mid-scroll as the address
+  // bar hides/shows, so only the middle card ever reliably finished
+  // fading in. Here all three cards are simply visible and swipeable,
+  // with a light fade-in like the rest of the page.
+  gsap.set('.review-card', { clearProps: 'transform,opacity,xPercent,yPercent,x,y,rotate' });
+  gsap.set('.review-card', { opacity: 1 });
+
+  gsap.from('.proof-heading', {
+    opacity: 0, y: 24, duration: 0.6, ease: 'power2.out',
+    scrollTrigger: { trigger: '.proof-heading', start: 'top 85%' },
   });
-  document.querySelectorAll('.review-card').forEach((card) => {
-    const x = parseFloat(card.dataset.x || 0);
-    const r = parseFloat(card.dataset.r || 0);
-    gsap.set(card, { xPercent: -50, yPercent: -50, x, y: 90, rotate: r, opacity: 0 });
+  gsap.from('.review-card', {
+    opacity: 0, y: 24, duration: 0.5, stagger: 0.12, ease: 'power2.out',
+    scrollTrigger: { trigger: '.proof-cards', start: 'top 90%' },
   });
-  proofTl
-    .from('.proof-heading', { opacity: 0, scale: 0.4, duration: 0.4 })
-    .to('.proof-heading', { opacity: 1, scale: 1, duration: 0.001 }, 0)
-    .to('.proof-heading', { opacity: 0, y: -40, duration: 0.3 }, 0.35)
-    .to('.review-card', {
-      opacity: 1, y: 0,
-      x: (i, el) => parseFloat(el.dataset.x || 0),
-      rotate: (i, el) => parseFloat(el.dataset.r || 0),
-      stagger: 0.15, duration: 0.6, ease: 'power2.out',
-    }, 0.3);
-}
+});
 
 /* ================= generic scroll reveals ================= */
 gsap.utils.toArray(

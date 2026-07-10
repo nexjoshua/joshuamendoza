@@ -739,6 +739,7 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
   .proof-pin{
     position:relative;
     height:auto;
+    overflow:visible;
     padding:4.5rem 0 3rem;
   }
   .proof-cards{
@@ -760,14 +761,34 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
     transform:none !important;
     top:auto !important;
     left:auto !important;
+    /* exactly one card per screen — no ambiguous partial peek */
     flex:0 0 90%;
     width:90%;
     margin-right:2.5vw;
     scroll-snap-align:center;
-    /* a real transition as each card settles into view, not just a hard jump */
     transition:opacity .35s var(--ease), transform .35s var(--ease);
   }
   .review-card:last-child{margin-right:0}
+}
+
+/* Dot indicators make it unmistakable that there are 3 cards to swipe
+   through — the plain peek-of-the-next-card approach wasn't reliably
+   communicating that, and could leave the last card easy to miss. */
+.proof-dots{display:none}
+@media (max-width:900px){
+  .proof-dots{
+    display:flex;justify-content:center;align-items:center;gap:.5rem;
+    margin-top:.5rem;
+  }
+  .proof-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:rgba(255,255,255,.25);
+    transition:background-color .3s var(--ease), transform .3s var(--ease);
+  }
+  .proof-dot.is-active{
+    background:var(--accent-bright);
+    transform:scale(1.35);
+  }
 }
 
 /* Small idle drift for the X logo behind "Real Results" — the desktop
@@ -923,6 +944,11 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
             <p class="review-value">36.1%</p>
             <div class="review-author"><div><strong>Conversion Rate</strong><small>Form → booked appointment</small></div></div>
           </div>
+        </div>
+        <div class="proof-dots" id="proofDots">
+          <span class="proof-dot is-active"></span>
+          <span class="proof-dot"></span>
+          <span class="proof-dot"></span>
         </div>
       </div>
       <div class="proof-spacer" style="height:0"></div>

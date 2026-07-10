@@ -825,6 +825,7 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
    off-screen with data-x transforms. Turn it into a swipeable
    row so all three cards are reachable within the pinned section. */
 @media (max-width:900px){
+  .proof-pin{ overflow:visible; }
   .proof-cards{
     flex-direction:row;
     justify-content:flex-start;
@@ -851,6 +852,24 @@ body.has-3d-bg .backdrop-blur-layer{display:none}
     transition:opacity .35s var(--ease), transform .35s var(--ease);
   }
   .review-card:last-child{margin-right:0}
+}
+
+/* Dot indicators for the mobile card carousel */
+.proof-dots{display:none}
+@media (max-width:900px){
+  .proof-dots{
+    display:flex;justify-content:center;align-items:center;gap:.5rem;
+    margin-top:.5rem;
+  }
+  .proof-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:rgba(255,255,255,.25);
+    transition:background-color .3s var(--ease), transform .3s var(--ease);
+  }
+  .proof-dot.is-active{
+    background:var(--accent-bright);
+    transform:scale(1.35);
+  }
 }
 
 /* Small idle drift for the X logo behind "Real Results" — the desktop
